@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+
+    <style type="text/css">
+        .btn-margin {margin-left: 1em;}        
+        input[type=file].hidden {
+            visibility: hidden;
+            width: 15rem;
+            margin-left: -15rem;
+        }
+        .file-label {
+            width: 15rem;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
+    <script src="https://unpkg.com/mithril/mithril.js"></script>
+    <script src="pixelate.js"></script>
+   
+
+    <div class="container" id="root">
+        <div class="row">            
+            <div class="column-50" id="form-root"></div>
+            <div class="column-50">
+                <img id="logo" src="penguin.png" style="min-width: 20em"/>
+            </div>
+            
+        </div>
+        <div class="row">    
+            <div class="column-100" id="result"></div>        
+        </div>
+    </div>    
+
+    <script>
+        var image = document.querySelector('#logo');
+        var formRoot = document.querySelector('#form-root');  
+
+        function pixelizeForm() {
+            var resWidth = 32
+            var fgColor = "#f5ee9f"
+            var bgColor = "#0772b0"
+            var pixelWidget = new PixelWidget("#result")
+
+            var pixelator = new Pixelator("#root", function(imgData) {
+                pixelWidget.update(imgData, {
+                    pixelSize: 18, 
+                    step: 20,
+                    pixelColorFunc: pixelColorFunc,     
+                })
+            })
+            
+            function pixelColorFunc(isFg) {
+               return isFg ? fgColor : bgColor
+            } 
+            function updatePixelWidget(imgData) {
+               
+            }
+
+            function updateImage() {
+                pixelator.update(image, {width: resWidth});
+            }
+
+            function exportSvg() {        
+                var blob = new Blob([pixelWidget.export()], {
+                    type: 'image/svg+xml'
+                });                                
+                window.open(URL.createObjectURL(blob), '_blank')
+            }
+
+            function importImage(e) {
+                var files = e.target.files
+                if (!files) return
+                image.src = URL.createObjectURL(files[0])
+                updateImage()                
+            }
+
+            return {
+                oninit(vnode) {
+                   updateImage()
+                },
+                view(vnode) {
+                    return [
+                        m("label","Result width:"),
+                        m("input[type=number][min=10][max=100]", {value: resWidth, oninput: function(e){
+                            resWidth = e.target.value
+                            updateImage()
+                        }}),
+                        m("label","Foreground color:"),
+                        m("input[type=color]", {value: fgColor, onchange: function(e){
+                            fgColor=e.target.value
+                            pixelWidget.render()
+                        }}),
+                        m("label","Background color:"),
+                        m("input[type=color]", {value: bgColor, onchange: function(e){
+                            bgColor=e.target.value
+                            pixelWidget.render()
+                        }}),
+                        m("label.button.file-label.btn-margin[for=uploads]","Upload"),
+                        m("input.hidden[type=file][accept=image/*][id=uploads]", {onchange: importImage}),                        
+                        m("button.button-outline.btn-margin", { onclick: exportSvg }, "Export")
+                    ]
+                }
+
+            }
+        }
+
+        m.mount(formRoot, pixelizeForm)    
+
+    </script>
+</body>
