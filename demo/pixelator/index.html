@@ -25,7 +25,7 @@
         <div class="row">            
             <div class="column-50" id="form-root"></div>
             <div class="column-50">
-                <img id="logo" src="penguin.png" style="min-width: 20em"/>
+                <img id="logo" src="penguin.png" style="width: 20em"/>
             </div>
             
         </div>
@@ -98,7 +98,7 @@
                             bgColor=e.target.value
                             pixelWidget.render()
                         }}),
-                        m("label.button.file-label.btn-margin[for=uploads]","Upload"),
+                        m("label.button.file-label.btn-margin[for=uploads]","Load image"),
                         m("input.hidden[type=file][accept=image/*][id=uploads]", {onchange: importImage}),                        
                         m("button.button-outline.btn-margin", { onclick: exportSvg }, "Export")
                     ]
